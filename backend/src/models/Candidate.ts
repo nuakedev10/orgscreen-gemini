@@ -22,6 +22,7 @@ export interface ICandidate extends Document {
   }[];
   resumeText?: string;
   source: 'umurava' | 'upload';
+  decisionStatus?: 'hired' | 'maybe' | 'rejected' | null;
   createdAt: Date;
 }
 
@@ -58,6 +59,11 @@ const CandidateSchema = new Schema<ICandidate>({
     type: String,
     enum: ['umurava', 'upload'],
     required: true
+  },
+  decisionStatus: {
+    type: String,
+    enum: ['hired', 'maybe', 'rejected', null],
+    default: null
   },
   createdAt: { type: Date, default: Date.now }
 });

@@ -3,11 +3,13 @@ import {
   createJob,
   getJobs,
   getJob,
-  updateJob
+  updateJob,
+  generateJobDescription
 } from '../controllers/jobController';
 
 const router = Router();
 
+router.post('/generate-description', generateJobDescription);
 router.post('/', createJob);
 router.get('/', getJobs);
 router.get('/:id', getJob);

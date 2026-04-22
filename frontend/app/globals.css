@@ -1,0 +1,476 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/*
+ * OrgScreen design system.
+ * Warm cream + deep ink canvas, terracotta primary, indigo + gold accents.
+ * Inspired by modern pan-African product identity (ALX, Andela, Flutterwave, MEST).
+ * Headlines: Space Grotesk (geometric, confident).
+ * Body: Inter (neutral, highly legible).
+ */
+
+:root {
+  /* Canvas */
+  --bg: #FBF8F1;            /* warm cream */
+  --bg-soft: #F3EDDF;       /* deeper cream for stripes / sections */
+  --surface: #FFFFFF;
+  --surface-soft: #FAF5EA;
+  --border: #E8E0CE;
+  --border-strong: #2A2423;
+
+  /* Ink */
+  --ink: #0F0C0A;           /* primary text — near-black with warm bias */
+  --ink-2: #2A2423;
+  --muted: #6E6559;
+  --muted-2: #9A9185;
+
+  /* Brand */
+  --primary: #E0531B;       /* terracotta / ALX-inspired orange */
+  --primary-dark: #B9411A;
+  --primary-soft: #FCE8DF;
+  --indigo: #17243B;        /* deep navy accent */
+  --indigo-2: #2B3E5F;
+  --gold: #D8A52A;
+  --gold-soft: #F6ECCB;
+
+  /* Semantic */
+  --success: #2F8F5D;
+  --success-soft: #DCEFE1;
+  --warning: #C48315;
+  --warning-soft: #FAEBCB;
+  --danger: #B8341F;
+  --danger-soft: #FADFD8;
+
+  /* Fonts — populated by next/font in layout.tsx */
+  --font-display: 'Space Grotesk', ui-sans-serif, system-ui, sans-serif;
+  --font-body: 'Inter', ui-sans-serif, system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html,
+body {
+  background-color: var(--bg);
+  color: var(--ink);
+  font-family: var(--font-body);
+  font-feature-settings: 'cv02', 'cv03', 'cv04', 'cv11';
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  background-color: var(--bg);
+  background-image:
+    radial-gradient(1200px 600px at 90% -10%, rgba(224, 83, 27, 0.08), transparent 60%),
+    radial-gradient(900px 500px at -10% 10%, rgba(23, 36, 59, 0.06), transparent 60%);
+  background-attachment: fixed;
+}
+
+h1, h2, h3, h4, h5 {
+  font-family: var(--font-display);
+  letter-spacing: -0.015em;
+  color: var(--ink);
+}
+
+/* ------------------------------------------------------------------ */
+/*  Cards                                                             */
+/* ------------------------------------------------------------------ */
+
+.card {
+  background: var(--surface-soft);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 24px;
+  transition: border-color 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.card-white {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 24px;
+  box-shadow: 0 1px 0 rgba(15, 12, 10, 0.02), 0 4px 18px rgba(15, 12, 10, 0.04);
+  transition: border-color 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.card-ink {
+  background: var(--ink);
+  color: #F4EEDF;
+  border-radius: 18px;
+  padding: 28px;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 10px 30px rgba(15, 12, 10, 0.18);
+}
+
+.card-ink h1,
+.card-ink h2,
+.card-ink h3 { color: #FBF8F1; }
+
+/* Subtle kente-inspired diagonal stripe accent you can drop inside any container */
+.accent-kente::before {
+  content: '';
+  position: absolute;
+  top: 0; right: 0; bottom: 0;
+  width: 160px;
+  pointer-events: none;
+  background-image: repeating-linear-gradient(
+    135deg,
+    rgba(224, 83, 27, 0.18) 0 8px,
+    transparent 8px 20px,
+    rgba(216, 165, 42, 0.22) 20px 28px,
+    transparent 28px 40px
+  );
+  mask-image: linear-gradient(to left, #000 0%, transparent 100%);
+}
+
+/* ------------------------------------------------------------------ */
+/*  Buttons                                                           */
+/* ------------------------------------------------------------------ */
+
+.btn-primary {
+  background: var(--primary);
+  color: #FFF8EF;
+  padding: 12px 22px;
+  border-radius: 12px;
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 15px;
+  letter-spacing: 0.01em;
+  transition: transform 0.15s ease, background 0.2s ease, box-shadow 0.2s ease;
+  cursor: pointer;
+  border: 1px solid var(--primary);
+  box-shadow: 0 1px 0 rgba(15, 12, 10, 0.04), 0 6px 18px rgba(224, 83, 27, 0.22);
+}
+
+.btn-primary:hover {
+  background: var(--primary-dark);
+  border-color: var(--primary-dark);
+  transform: translateY(-1px);
+  box-shadow: 0 2px 0 rgba(15, 12, 10, 0.06), 0 10px 24px rgba(224, 83, 27, 0.28);
+}
+
+.btn-primary:disabled {
+  background: #E5C3B4;
+  border-color: #E5C3B4;
+  color: #FFF8EF;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+.btn-secondary {
+  background: var(--surface);
+  color: var(--ink);
+  padding: 12px 22px;
+  border-radius: 12px;
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 15px;
+  transition: all 0.2s ease;
+  cursor: pointer;
+  border: 1px solid var(--border);
+}
+
+.btn-secondary:hover {
+  background: var(--surface-soft);
+  border-color: var(--border-strong);
+}
+
+.btn-ghost {
+  background: transparent;
+  color: var(--ink);
+  padding: 10px 14px;
+  border-radius: 10px;
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 14px;
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.btn-ghost:hover { background: var(--bg-soft); }
+
+.btn-danger {
+  background: var(--danger-soft);
+  color: var(--danger);
+  padding: 10px 16px;
+  border-radius: 10px;
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 14px;
+  border: 1px solid rgba(184, 52, 31, 0.25);
+  cursor: pointer;
+  transition: background 0.2s ease, color 0.2s ease;
+}
+
+.btn-danger:hover {
+  background: var(--danger);
+  color: #FFF8EF;
+}
+
+.icon-btn {
+  width: 36px;
+  height: 36px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--ink-2);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.icon-btn:hover {
+  border-color: var(--primary);
+  color: var(--primary);
+  background: var(--primary-soft);
+}
+
+/* ------------------------------------------------------------------ */
+/*  Inputs                                                            */
+/* ------------------------------------------------------------------ */
+
+.input {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 12px 14px;
+  color: var(--ink);
+  width: 100%;
+  outline: none;
+  transition: border 0.15s, box-shadow 0.15s;
+  font-family: var(--font-body);
+  font-size: 15px;
+}
+
+.input::placeholder { color: var(--muted-2); }
+
+.input:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(224, 83, 27, 0.15);
+}
+
+select.input {
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%236E6559' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 14px center;
+  padding-right: 36px;
+  cursor: pointer;
+}
+
+textarea.input {
+  resize: vertical;
+  min-height: 100px;
+  line-height: 1.6;
+}
+
+/* ------------------------------------------------------------------ */
+/*  Badges / Pills                                                    */
+/* ------------------------------------------------------------------ */
+
+.pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 600;
+  font-family: var(--font-display);
+  letter-spacing: 0.02em;
+  border: 1px solid transparent;
+}
+
+.pill-brand {
+  background: var(--primary-soft);
+  color: var(--primary-dark);
+  border-color: rgba(224, 83, 27, 0.2);
+}
+
+.pill-indigo {
+  background: #E7ECF5;
+  color: var(--indigo);
+  border-color: rgba(23, 36, 59, 0.2);
+}
+
+.pill-gold {
+  background: var(--gold-soft);
+  color: #7A5A0F;
+  border-color: rgba(216, 165, 42, 0.3);
+}
+
+.badge-strong {
+  background: var(--success-soft);
+  color: var(--success);
+  padding: 4px 12px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 700;
+  font-family: var(--font-display);
+  display: inline-block;
+}
+
+.badge-hire {
+  background: #E0E8F4;
+  color: var(--indigo);
+  padding: 4px 12px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 700;
+  font-family: var(--font-display);
+  display: inline-block;
+}
+
+.badge-maybe {
+  background: var(--warning-soft);
+  color: var(--warning);
+  padding: 4px 12px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 700;
+  font-family: var(--font-display);
+  display: inline-block;
+}
+
+.badge-no {
+  background: var(--danger-soft);
+  color: var(--danger);
+  padding: 4px 12px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 700;
+  font-family: var(--font-display);
+  display: inline-block;
+}
+
+/* ------------------------------------------------------------------ */
+/*  Nav                                                                */
+/* ------------------------------------------------------------------ */
+
+.nav {
+  background: rgba(251, 248, 241, 0.85);
+  backdrop-filter: blur(14px);
+  border-bottom: 1px solid var(--border);
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  padding: 0 24px;
+  height: 68px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.brand-mark {
+  width: 34px;
+  height: 34px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--ink);
+  color: #FFF8EF;
+  border-radius: 10px;
+  position: relative;
+  overflow: hidden;
+}
+
+.brand-mark::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(
+    45deg,
+    transparent 0 6px,
+    rgba(224, 83, 27, 0.35) 6px 7px,
+    transparent 7px 13px
+  );
+  opacity: 0.55;
+}
+
+.brand-mark svg { position: relative; z-index: 1; }
+
+.brand-wordmark {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 19px;
+  letter-spacing: -0.02em;
+  color: var(--ink);
+}
+
+/* ------------------------------------------------------------------ */
+/*  Utility                                                           */
+/* ------------------------------------------------------------------ */
+
+.divider {
+  height: 1px;
+  background: var(--border);
+  border: none;
+  margin: 24px 0;
+}
+
+.kbd {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  background: var(--bg-soft);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 1px 6px;
+  color: var(--ink-2);
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 0.6; transform: scaleX(0.92); }
+  50% { opacity: 1; transform: scaleX(1); }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.fade-in { animation: fadeIn 0.3s ease both; }
+
+/* Adinkra-inspired ornamental divider — Sankofa-ish spiral motif.
+   Usable as a standalone accent.                                     */
+.adinkra-rule {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--muted);
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 12px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  margin: 12px 0;
+}
+
+.adinkra-rule::before,
+.adinkra-rule::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background:
+    linear-gradient(to right, transparent, var(--border), var(--border), transparent);
+}
+
+/* Scrollbar polish */
+::-webkit-scrollbar { width: 10px; height: 10px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb {
+  background: #E0D6BF;
+  border-radius: 10px;
+  border: 2px solid var(--bg);
+}
+::-webkit-scrollbar-thumb:hover { background: #C9BC9C; }

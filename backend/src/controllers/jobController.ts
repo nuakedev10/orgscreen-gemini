@@ -1,6 +1,8 @@
 import { Request, Response } from 'express';
 import Job from '../models/Job';
 import Organization from '../models/Organization';
+import { generateContent } from '../services/geminiService';
+import { buildOrgContext } from '../services/promptService';
 
 // Create a job
 export const createJob = async (req: Request, res: Response): Promise<void> => {
@@ -76,6 +78,58 @@ export const getJob = async (req: Request, res: Response): Promise<void> => {
     res.json({ job });
   } catch (error) {
     res.status(500).json({ error: 'Failed to fetch job' });
+  }
+};
+
+// Generate job description using AI
+export const generateJobDescription = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const { jobTitle, organizationId } = req.body;
+
+    if (!jobTitle || !organizationId) {
+      res.status(400).json({ error: 'jobTitle and organizationId are required' });
+      return;
+    }
+
+    const org = await Organization.findById(organizationId);
+    if (!org) {
+      res.status(404).json({ error: 'Organization not found' });
+      return;
+    }
+
+    const orgContext = buildOrgContext(org);
+
+    const prompt = `You are an expert HR professional and job description writer.
+
+${orgContext}
+
+Generate a complete, detailed job description for the role: "${jobTitle}"
+
+The description must be tailored to the organization's culture, values, and hiring priorities above.
+
+Respond ONLY with valid JSON in this exact structure (no markdown, no code blocks):
+{
+  "department": "the most appropriate department for this role",
+  "experienceLevel": "one of: Junior (0-2 years), Mid-level (2-5 years), Senior (5+ years), Lead / Principal",
+  "educationRequirement": "education requirement tailored to this role and the organization",
+  "requiredSkills": ["5-8 specific required skills"],
+  "niceToHaveSkills": ["3-5 nice-to-have skills"],
+  "responsibilities": ["5-8 key responsibilities"],
+  "additionalNotes": "additional context or notes about this role at this organization"
+}`;
+
+    const raw = await generateContent(prompt);
+    const cleaned = raw.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
+    const jobDescription = JSON.parse(cleaned);
+
+    res.json({ jobDescription });
+  } catch (error: any) {
+    console.error('Generate job description error:', error);
+    if (error instanceof SyntaxError) {
+      res.status(500).json({ error: 'AI returned invalid JSON. Please try again.' });
+    } else {
+      res.status(500).json({ error: 'Failed to generate job description' });
+    }
   }
 };
 

@@ -119,3 +119,29 @@ export const getCandidates = async (req: Request, res: Response): Promise<void> 
     res.status(500).json({ error: 'Failed to fetch candidates' });
   }
 };
+export const updateCandidateStatus = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const { id } = req.params;
+    const { status } = req.body;
+
+    if (!['hired', 'maybe', 'rejected'].includes(status)) {
+      res.status(400).json({ error: 'Invalid status. Must be hired, maybe, or rejected' });
+      return;
+    }
+
+    const candidate = await Candidate.findByIdAndUpdate(
+      id,
+      { decisionStatus: status },
+      { new: true }
+    );
+
+    if (!candidate) {
+      res.status(404).json({ error: 'Candidate not found' });
+      return;
+    }
+
+    res.json({ message: 'Status updated', candidate });
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to update candidate status' });
+  }
+};
