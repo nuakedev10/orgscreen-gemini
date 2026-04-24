@@ -62,7 +62,7 @@ const CandidateSchema = new Schema<ICandidate>({
   },
   decisionStatus: {
     type: String,
-    enum: ['hired', 'maybe', 'rejected', null],
+    enum: ['hired', 'maybe', 'rejected'],
     default: null
   },
   createdAt: { type: Date, default: Date.now }

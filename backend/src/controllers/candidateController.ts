@@ -1,6 +1,11 @@
 import { Request, Response } from 'express';
 import Candidate from '../models/Candidate';
-import { parseCSV, parsePDF, cleanupFile } from '../services/fileParserService';
+import {
+  parseCSV,
+  parsePDF,
+  cleanupFile,
+  extractResumeFields,
+} from '../services/fileParserService';
 import mongoose from 'mongoose';
 
 export const addCandidates = async (req: Request, res: Response): Promise<void> => {
@@ -109,6 +114,93 @@ export const uploadPDFCandidate = async (req: Request, res: Response): Promise<v
   }
 };
 
+// Bulk PDF resume upload. Parses each PDF, extracts structured fields via
+// Gemini, then saves to DB. Returns a per-file report so the UI can show
+// exactly which resumes succeeded and which failed and why.
+export const uploadMultiplePDFs = async (req: Request, res: Response): Promise<void> => {
+  const files = (req.files as Express.Multer.File[]) || [];
+
+  try {
+    if (files.length === 0) {
+      res.status(400).json({ error: 'No PDF files uploaded' });
+      return;
+    }
+
+    const { jobId, organizationId } = req.body;
+
+    if (!jobId || !organizationId) {
+      files.forEach(f => cleanupFile(f.path));
+      res.status(400).json({ error: 'jobId and organizationId are required' });
+      return;
+    }
+
+    const results: Array<{
+      filename: string;
+      status: 'parsed' | 'failed';
+      candidate?: any;
+      reason?: string;
+    }> = [];
+
+    // Process sequentially to avoid slamming the Gemini API in parallel.
+    for (const file of files) {
+      try {
+        const resumeText = await parsePDF(file.path);
+        const extracted = await extractResumeFields(resumeText, file.originalname);
+
+        const candidate = await Candidate.create({
+          jobId: new mongoose.Types.ObjectId(jobId),
+          organizationId: new mongoose.Types.ObjectId(organizationId),
+          fullName: extracted.fullName,
+          email: extracted.email,
+          phone: extracted.phone,
+          location: extracted.location,
+          skills: extracted.skills,
+          yearsOfExperience: extracted.yearsOfExperience,
+          education: extracted.education,
+          workHistory: extracted.workHistory,
+          resumeText: resumeText.slice(0, 20000),
+          source: 'upload',
+        });
+
+        results.push({
+          filename: file.originalname,
+          status: 'parsed',
+          candidate: {
+            _id: candidate._id,
+            fullName: candidate.fullName,
+            email: candidate.email,
+            skills: candidate.skills,
+            yearsOfExperience: candidate.yearsOfExperience,
+          },
+        });
+      } catch (err: any) {
+        console.error('[uploadMultiplePDFs] Failed on ' + file.originalname + ':', err && err.message ? err.message : err);
+        results.push({
+          filename: file.originalname,
+          status: 'failed',
+          reason: (err && err.message) || 'Unknown error while parsing resume',
+        });
+      } finally {
+        cleanupFile(file.path);
+      }
+    }
+
+    const parsed = results.filter(r => r.status === 'parsed').length;
+    const failed = results.length - parsed;
+
+    res.status(201).json({
+      message: 'Processed ' + results.length + ' resume(s) - ' + parsed + ' imported, ' + failed + ' failed',
+      results,
+      parsed,
+      failed,
+    });
+  } catch (error: any) {
+    console.error('Bulk PDF upload error:', error);
+    files.forEach(f => cleanupFile(f.path));
+    res.status(500).json({ error: (error && error.message) || 'Failed to process resumes' });
+  }
+};
+
 export const getCandidates = async (req: Request, res: Response): Promise<void> => {
   try {
     const { jobId } = req.query;
@@ -119,6 +211,7 @@ export const getCandidates = async (req: Request, res: Response): Promise<void> 
     res.status(500).json({ error: 'Failed to fetch candidates' });
   }
 };
+
 export const updateCandidateStatus = async (req: Request, res: Response): Promise<void> => {
   try {
     const { id } = req.params;

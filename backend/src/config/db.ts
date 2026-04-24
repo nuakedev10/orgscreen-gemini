@@ -1,11 +1,15 @@
 import mongoose from 'mongoose';
 
 const connectDB = async (): Promise<void> => {
+  const mongoURI = process.env.MONGODB_URI;
+
+  if (!mongoURI) {
+    console.error('MONGODB_URI is not set. Aborting startup.');
+    process.exit(1);
+  }
+
   try {
-    const mongoURI = process.env.MONGODB_URI as string;
-
     await mongoose.connect(mongoURI);
-
     console.log('MongoDB connected successfully');
   } catch (error) {
     console.error('MongoDB connection failed:', error);
