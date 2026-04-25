@@ -4,3 +4,11 @@ providers = ["node"]
 
 [phases.setup]
 nixPkgs = ["nodejs_20", "npm-9_x"]
+
+# Override the auto-generated build phase. Without this, Nixpacks runs
+# "npm ci && npm run build", but the duplicate npm ci tries to rmdir
+# /app/node_modules/.cache (a Docker cache mount), causing EBUSY and
+# failing the build. npm ci already ran in the install phase, so here
+# we only need the actual build step.
+[phases.build]
+cmds = ["npm run build"]
