@@ -1,6 +1,6 @@
 'use client';
 import { useState, useEffect, Suspense, useRef } from 'react';
-import { addCandidates, uploadMultiplePDFs, getCandidates, getJob } from '@/lib/api';
+import { addCandidates, uploadCSV, uploadMultiplePDFs, getCandidates, getJob } from '@/lib/api';
 import { useRouter, useSearchParams } from 'next/navigation';
 import {
   ArrowLeft,
@@ -15,7 +15,8 @@ import {
   FileUp,
   FileCheck2,
   FileWarning,
-  Loader2
+  Loader2,
+  FileSpreadsheet
 } from 'lucide-react';
 import Link from 'next/link';
 
@@ -62,10 +63,12 @@ function CandidatesPage() {
   const [existing, setExisting] = useState<any[]>([]);
   const [rows, setRows] = useState<ManualCandidate[]>([emptyCandidate()]);
   const [pdfFiles, setPdfFiles] = useState<File[]>([]);
+  const [csvFile, setCsvFile] = useState<File | null>(null);
   const [uploadResults, setUploadResults] = useState<UploadResult[]>([]);
-  const [mode, setMode] = useState<'resumes' | 'manual'>('resumes');
+  const [mode, setMode] = useState<'resumes' | 'csv' | 'manual'>('resumes');
   const [saving, setSaving] = useState(false);
   const [uploading, setUploading] = useState(false);
+  const [csvUploading, setCsvUploading] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
   const dropRef = useRef<HTMLLabelElement>(null);
@@ -193,6 +196,49 @@ function CandidatesPage() {
     }
   };
 
+  const pickCSV = (fileList: FileList | null) => {
+    if (!fileList || fileList.length === 0) return;
+    const file = fileList[0];
+    const isCsv = file.name.toLowerCase().endsWith('.csv') || file.type === 'text/csv';
+    if (!isCsv) {
+      setError('Please pick a .csv file.');
+      return;
+    }
+    setError('');
+    setCsvFile(file);
+  };
+
+  const handleUploadCSV = async () => {
+    setError('');
+    setSuccess('');
+
+    if (!csvFile) {
+      setError('Pick a CSV file first.');
+      return;
+    }
+
+    const formData = new FormData();
+    formData.append('file', csvFile);
+    formData.append('jobId', jobId);
+    formData.append('organizationId', orgId);
+
+    setCsvUploading(true);
+    try {
+      const res = await uploadCSV(formData);
+      const count = res.data.candidates?.length || 0;
+      setSuccess(res.data.message || `${count} candidate${count === 1 ? '' : 's'} imported from CSV.`);
+      setCsvFile(null);
+
+      const refreshed = await getCandidates(jobId);
+      setExisting(refreshed.data.candidates || []);
+    } catch (err: any) {
+      console.error('uploadCSV failed:', err);
+      setError(err?.response?.data?.error || err.message || 'Failed to import CSV.');
+    } finally {
+      setCsvUploading(false);
+    }
+  };
+
   const goToScreening = () => {
     router.push(`/screen?jobId=${jobId}&orgId=${orgId}`);
   };
@@ -266,6 +312,14 @@ function CandidatesPage() {
           style={{ display: 'flex', alignItems: 'center', gap: '8px' }}
         >
           <Upload size={16} /> Upload resumes (PDF)
+        </button>
+        <button
+          type="button"
+          onClick={() => setMode('csv')}
+          className={mode === 'csv' ? 'btn-primary' : 'btn-secondary'}
+          style={{ display: 'flex', alignItems: 'center', gap: '8px' }}
+        >
+          <FileSpreadsheet size={16} /> Upload CSV
         </button>
         <button
           type="button"
@@ -435,6 +489,139 @@ function CandidatesPage() {
               </div>
             </div>
           )}
+        </div>
+      )}
+
+      {mode === 'csv' && (
+        <div className="card-white" style={{ marginBottom: '24px' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: '6px', flexWrap: 'wrap', gap: '8px' }}>
+            <h2 style={{ fontWeight: 700, fontSize: '17px' }}>Bulk CSV import</h2>
+            <span className="pill pill-indigo" style={{ fontSize: '11px' }}>
+              <FileSpreadsheet size={11} /> Structured fields
+            </span>
+          </div>
+          <p style={{ color: 'var(--muted)', fontSize: '13.5px', marginBottom: '16px', lineHeight: 1.55 }}>
+            Drop a single .csv with one candidate per row. The first row should be a header row with these column names (any order, case-insensitive):
+          </p>
+
+          <div
+            style={{
+              background: 'var(--surface-soft)',
+              border: '1px solid var(--border)',
+              borderRadius: '10px',
+              padding: '12px 14px',
+              marginBottom: '16px',
+              fontSize: '12.5px',
+              fontFamily: 'var(--font-mono)',
+              color: 'var(--ink)',
+              overflowX: 'auto'
+            }}
+          >
+            fullName, email, phone, location, skills, experience, degree, field, institution
+          </div>
+          <p style={{ color: 'var(--muted)', fontSize: '12.5px', marginBottom: '16px', lineHeight: 1.5 }}>
+            Notes: <strong style={{ color: 'var(--ink)' }}>fullName</strong> and <strong style={{ color: 'var(--ink)' }}>email</strong> are required for a row to be imported.
+            Multiple skills go in the <code>skills</code> cell separated by <code>;</code> (semicolons), e.g. <code>Python;SQL;Airflow</code>.
+            Rows missing name or email are skipped silently.
+          </p>
+
+          <label
+            htmlFor="csv-file"
+            onDragOver={e => {
+              e.preventDefault();
+              (e.currentTarget as HTMLElement).style.borderColor = 'var(--primary)';
+              (e.currentTarget as HTMLElement).style.background = 'var(--primary-soft)';
+            }}
+            onDragLeave={e => {
+              (e.currentTarget as HTMLElement).style.borderColor = 'var(--border)';
+              (e.currentTarget as HTMLElement).style.background = 'var(--surface-soft)';
+            }}
+            onDrop={e => {
+              e.preventDefault();
+              (e.currentTarget as HTMLElement).style.borderColor = 'var(--border)';
+              (e.currentTarget as HTMLElement).style.background = 'var(--surface-soft)';
+              pickCSV(e.dataTransfer.files);
+            }}
+            style={{
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              justifyContent: 'center',
+              border: '2px dashed var(--border)',
+              borderRadius: '14px',
+              padding: '40px 24px',
+              cursor: 'pointer',
+              background: 'var(--surface-soft)',
+              marginBottom: '16px',
+              transition: 'all 0.15s ease'
+            }}
+          >
+            <FileSpreadsheet size={34} color="var(--primary)" style={{ marginBottom: '10px' }} />
+            <p style={{ color: 'var(--ink)', fontWeight: 700, marginBottom: '4px', fontSize: '15.5px' }}>
+              Drop a CSV here or click to browse
+            </p>
+            <p style={{ color: 'var(--muted)', fontSize: '13px' }}>
+              .csv only · one file
+            </p>
+            <input
+              id="csv-file"
+              type="file"
+              accept=".csv,text/csv"
+              onChange={e => pickCSV(e.target.files)}
+              style={{ display: 'none' }}
+            />
+          </label>
+
+          {csvFile && (
+            <div
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '8px',
+                padding: '10px 12px',
+                background: '#fff',
+                border: '1px solid var(--border)',
+                borderRadius: '10px',
+                fontSize: '13px',
+                marginBottom: '16px'
+              }}
+            >
+              <FileSpreadsheet size={15} color="var(--primary)" style={{ flexShrink: 0 }} />
+              <span style={{ flex: 1, minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', fontWeight: 600 }}>
+                {csvFile.name}
+              </span>
+              <span style={{ color: 'var(--muted-2)', fontSize: '11.5px', flexShrink: 0 }}>
+                {(csvFile.size / 1024).toFixed(0)} KB
+              </span>
+              <button
+                type="button"
+                onClick={() => setCsvFile(null)}
+                aria-label={`Remove ${csvFile.name}`}
+                className="icon-btn"
+                style={{ padding: '4px' }}
+              >
+                <X size={13} />
+              </button>
+            </div>
+          )}
+
+          <button
+            type="button"
+            className="btn-primary"
+            onClick={handleUploadCSV}
+            disabled={csvUploading || !csvFile}
+            style={{ width: '100%', padding: '14px', fontSize: '16px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px' }}
+          >
+            {csvUploading ? (
+              <>
+                <Loader2 size={16} className="spin" /> Importing CSV...
+              </>
+            ) : (
+              <>
+                <FileSpreadsheet size={16} /> Import candidates from CSV
+              </>
+            )}
+          </button>
         </div>
       )}
 
