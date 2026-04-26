@@ -23,10 +23,10 @@ export const getGeminiModel = (opts?: { jsonMode?: boolean }) => {
     generationConfig.responseMimeType = 'application/json';
   }
 
-  // Use env var override if set, otherwise use the explicit versioned preview ID.
-  // 'gemini-2.5-flash' (unversioned) routes to gemini-2.0-flash internally and
-  // shares its quota. The dated preview ID has its own separate free-tier quota.
-  const model = process.env.GEMINI_MODEL || 'gemini-2.5-flash-preview-04-17';
+  // Use env var override if set; default to gemini-1.5-flash which is stable,
+  // confirmed available on v1beta, and has 1 500 free requests/day — well above
+  // what a hackathon demo needs. Set GEMINI_MODEL=gemini-2.0-flash to switch.
+  const model = process.env.GEMINI_MODEL || 'gemini-1.5-flash';
 
   return genAI.getGenerativeModel({
     model,
