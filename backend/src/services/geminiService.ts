@@ -23,9 +23,13 @@ export const getGeminiModel = (opts?: { jsonMode?: boolean }) => {
     generationConfig.responseMimeType = 'application/json';
   }
 
+  // Use env var override if set, otherwise use the explicit versioned preview ID.
+  // 'gemini-2.5-flash' (unversioned) routes to gemini-2.0-flash internally and
+  // shares its quota. The dated preview ID has its own separate free-tier quota.
+  const model = process.env.GEMINI_MODEL || 'gemini-2.5-flash-preview-04-17';
+
   return genAI.getGenerativeModel({
-    // Hackathon: 2.0-flash has a 200/day free tier vs 20/day on 2.5-flash.
-    model: 'gemini-2.0-flash',
+    model,
     generationConfig,
   });
 };
