@@ -23,7 +23,7 @@ export const getGeminiModel = (opts?: { jsonMode?: boolean }) => {
     generationConfig.responseMimeType = 'application/json';
   }
 
-  const model = process.env.GEMINI_MODEL || 'gemini-2.0-flash';
+  const model = process.env.GEMINI_MODEL || 'gemini-2.5-flash';
 
   return genAI.getGenerativeModel({
     model,
