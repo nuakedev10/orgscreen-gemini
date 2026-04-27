@@ -20,7 +20,7 @@ export const getGeminiModel = () => {
     generationConfig: {
       temperature: 0.4,
       topP: 0.95,
-      maxOutputTokens: 8192,
+      maxOutputTokens: 16384,
     },
   });
 };

@@ -25,9 +25,6 @@ export const getCandidates = (jobId: string) => api.get(`/candidates?jobId=${job
 export const uploadCSV = (formData: FormData) => api.post('/candidates/upload/csv', formData, {
   headers: { 'Content-Type': 'multipart/form-data' }
 });
-export const uploadJSON = (formData: FormData) => api.post('/candidates/upload/json', formData, {
-  headers: { 'Content-Type': 'multipart/form-data' }
-});
 export const uploadMultiplePDFs = (formData: FormData) => api.post('/candidates/upload/pdfs', formData, {
   headers: { 'Content-Type': 'multipart/form-data' },
   // AI extraction for 20+ resumes can take a while; give Axios room.

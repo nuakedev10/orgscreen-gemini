@@ -108,57 +108,17 @@ export default function SetupPage() {
         <div className="card-white">
           <h2 style={{ fontWeight: 700, marginBottom: '4px', fontSize: '17px' }}>Culture values</h2>
           <p style={{ color: 'var(--muted)', fontSize: '13.5px', marginBottom: '14px' }}>What principles define how you operate? The AI uses these to score culture fit.</p>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(240px, 1fr))', gap: '12px' }}>
-            {form.cultureValues.map((val, i) => (
-              <div
-                key={i}
-                style={{
-                  position: 'relative',
-                  border: '1px solid var(--border)',
-                  borderRadius: '12px',
-                  padding: '12px',
-                  background: '#fff',
-                  display: 'flex',
-                  flexDirection: 'column',
-                  gap: '6px',
-                  minHeight: '160px'
-                }}
-              >
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                  <span style={{ fontSize: '12px', fontWeight: 600, color: 'var(--muted)', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
-                    Value {i + 1}
-                  </span>
-                  {form.cultureValues.length > 1 && (
-                    <button
-                      type="button"
-                      onClick={() => removeItem('cultureValues', i)}
-                      className="icon-btn"
-                      aria-label="Remove value"
-                      style={{ padding: '4px' }}
-                    >
-                      <X size={13} />
-                    </button>
-                  )}
-                </div>
-                <textarea
-                  className="input"
-                  value={val}
-                  onChange={e => updateList('cultureValues', i, e.target.value)}
-                  placeholder={`e.g. "Bias for action — we ship rough, learn fast, polish later."`}
-                  style={{
-                    flex: 1,
-                    minHeight: '110px',
-                    resize: 'vertical',
-                    fontSize: '14px',
-                    lineHeight: 1.55,
-                    whiteSpace: 'pre-wrap',
-                    overflowWrap: 'break-word'
-                  }}
-                />
-              </div>
-            ))}
-          </div>
-          <button type="button" onClick={() => addItem('cultureValues')} style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', color: 'var(--primary)', background: 'none', border: 'none', cursor: 'pointer', fontSize: '14px', fontWeight: 600, marginTop: '12px' }}>
+          {form.cultureValues.map((val, i) => (
+            <div key={i} style={{ display: 'flex', gap: '8px', marginBottom: '8px' }}>
+              <input className="input" value={val} onChange={e => updateList('cultureValues', i, e.target.value)} placeholder={`Value ${i + 1}  (e.g. "Bias for action")`} />
+              {form.cultureValues.length > 1 && (
+                <button type="button" onClick={() => removeItem('cultureValues', i)} className="icon-btn" aria-label="Remove value">
+                  <X size={15} />
+                </button>
+              )}
+            </div>
+          ))}
+          <button type="button" onClick={() => addItem('cultureValues')} style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', color: 'var(--primary)', background: 'none', border: 'none', cursor: 'pointer', fontSize: '14px', fontWeight: 600, marginTop: '4px' }}>
             <Plus size={14} /> Add value
           </button>
         </div>
@@ -166,57 +126,17 @@ export default function SetupPage() {
         <div className="card-white">
           <h2 style={{ fontWeight: 700, marginBottom: '4px', fontSize: '17px' }}>Ideal candidate personas</h2>
           <p style={{ color: 'var(--muted)', fontSize: '13.5px', marginBottom: '14px' }}>Describe the type of people who thrive here. Be specific — vague personas produce generic screening.</p>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '12px' }}>
-            {form.idealCandidatePersonas.map((val, i) => (
-              <div
-                key={i}
-                style={{
-                  position: 'relative',
-                  border: '1px solid var(--border)',
-                  borderRadius: '12px',
-                  padding: '12px',
-                  background: '#fff',
-                  display: 'flex',
-                  flexDirection: 'column',
-                  gap: '6px',
-                  minHeight: '180px'
-                }}
-              >
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                  <span style={{ fontSize: '12px', fontWeight: 600, color: 'var(--muted)', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
-                    Persona {i + 1}
-                  </span>
-                  {form.idealCandidatePersonas.length > 1 && (
-                    <button
-                      type="button"
-                      onClick={() => removeItem('idealCandidatePersonas', i)}
-                      className="icon-btn"
-                      aria-label="Remove persona"
-                      style={{ padding: '4px' }}
-                    >
-                      <X size={13} />
-                    </button>
-                  )}
-                </div>
-                <textarea
-                  className="input"
-                  value={val}
-                  onChange={e => updateList('idealCandidatePersonas', i, e.target.value)}
-                  placeholder={`e.g. "Self-taught builder who shipped at an African startup; comfortable in messy codebases; mentors juniors."`}
-                  style={{
-                    flex: 1,
-                    minHeight: '130px',
-                    resize: 'vertical',
-                    fontSize: '14px',
-                    lineHeight: 1.55,
-                    whiteSpace: 'pre-wrap',
-                    overflowWrap: 'break-word'
-                  }}
-                />
-              </div>
-            ))}
-          </div>
-          <button type="button" onClick={() => addItem('idealCandidatePersonas')} style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', color: 'var(--primary)', background: 'none', border: 'none', cursor: 'pointer', fontSize: '14px', fontWeight: 600, marginTop: '12px' }}>
+          {form.idealCandidatePersonas.map((val, i) => (
+            <div key={i} style={{ display: 'flex', gap: '8px', marginBottom: '8px' }}>
+              <input className="input" value={val} onChange={e => updateList('idealCandidatePersonas', i, e.target.value)} placeholder={`Persona ${i + 1}  (e.g. "Self-taught builder who shipped at an African startup")`} />
+              {form.idealCandidatePersonas.length > 1 && (
+                <button type="button" onClick={() => removeItem('idealCandidatePersonas', i)} className="icon-btn" aria-label="Remove persona">
+                  <X size={15} />
+                </button>
+              )}
+            </div>
+          ))}
+          <button type="button" onClick={() => addItem('idealCandidatePersonas')} style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', color: 'var(--primary)', background: 'none', border: 'none', cursor: 'pointer', fontSize: '14px', fontWeight: 600, marginTop: '4px' }}>
             <Plus size={14} /> Add persona
           </button>
         </div>

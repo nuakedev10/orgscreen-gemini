@@ -2,21 +2,17 @@ import { Router } from 'express';
 import {
   addCandidates,
   uploadCSVCandidates,
-  uploadJSONProfiles,
   uploadPDFCandidate,
-  uploadMultiplePDFs,
   getCandidates,
-  updateCandidateStatus,
+  updateCandidateStatus
 } from '../controllers/candidateController';
-import { upload, resumeUpload } from '../middleware/upload';
+import { upload } from '../middleware/upload';
 
 const router = Router();
 
 router.post('/', addCandidates);
 router.post('/upload/csv', upload.single('file'), uploadCSVCandidates);
-router.post('/upload/json', upload.single('file'), uploadJSONProfiles);
 router.post('/upload/pdf', upload.single('file'), uploadPDFCandidate);
-router.post('/upload/pdfs', resumeUpload.array('files', 25), uploadMultiplePDFs);
 router.get('/', getCandidates);
 router.patch('/:id/status', updateCandidateStatus);
 

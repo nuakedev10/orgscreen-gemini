@@ -73,11 +73,7 @@ function JobForm() {
       setGenerateSuccess(true);
       setTimeout(() => setGenerateSuccess(false), 4000);
     } catch (err: any) {
-      const errData = err?.response?.data;
-      const msg = errData?.detail
-        ? `${errData.error}: ${errData.detail}`
-        : errData?.error || err?.message || 'Failed to generate job description. Try again.';
-      setError(msg);
+      setError(err?.response?.data?.error || 'Failed to generate job description. Try again.');
     } finally {
       setGenerating(false);
     }

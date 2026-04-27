@@ -50,9 +50,12 @@ export const triggerScreening = async (req: Request, res: Response): Promise<voi
       totalCandidatesScreened: result.totalCandidatesScreened,
       screeningNotes: result.screeningNotes
     });
-  } catch (error) {
+  } catch (error: any) {
     console.error('Screening error:', error);
-    res.status(500).json({ error: 'Screening failed. Please try again.' });
+    res.status(500).json({
+      error: 'Screening failed. Please try again.',
+      detail: error?.message || String(error)
+    });
   }
 };
 

@@ -13,8 +13,7 @@ import {
   Scale,
   Zap,
   Plus,
-  AlertTriangle,
-  Mail
+  AlertTriangle
 } from 'lucide-react';
 import BrandMark from '@/components/BrandMark';
 
@@ -75,9 +74,6 @@ export default function Home() {
           <span className="pill pill-gold" style={{ marginLeft: '8px' }}>Built for Africa</span>
         </Link>
         <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-          <Link href="/team">
-            <button className="btn-ghost">Team</button>
-          </Link>
           <Link href="/results/all">
             <button className="btn-ghost">Results</button>
           </Link>
@@ -117,7 +113,10 @@ export default function Home() {
         {/* Hero */}
         <section className="card-ink accent-kente fade-in" style={{ marginBottom: '48px' }}>
           <div style={{ position: 'relative', zIndex: 1, maxWidth: '640px' }}>
-            <h1 style={{ fontSize: '48px', fontWeight: 700, lineHeight: 1.08, marginBottom: '18px', color: '#FBF8F1' }}>
+            <span className="pill pill-brand" style={{ background: 'rgba(224,83,27,0.18)', color: '#FBC7AE', borderColor: 'rgba(224,83,27,0.35)' }}>
+              <Sparkles size={13} /> Powered by Gemini 2.5 Flash
+            </span>
+            <h1 style={{ fontSize: '48px', fontWeight: 700, lineHeight: 1.08, marginTop: '18px', marginBottom: '18px', color: '#FBF8F1' }}>
               AI screening that thinks<br />
               <span style={{ color: '#F8B77A' }}>like your organization.</span>
             </h1>
@@ -303,74 +302,10 @@ export default function Home() {
           )}
         </section>
 
-      </main>
-
-      <footer
-        style={{
-          borderTop: '1px solid var(--border)',
-          background: 'var(--surface-soft)',
-          marginTop: '40px'
-        }}
-      >
-        <div
-          style={{
-            maxWidth: '1100px',
-            margin: '0 auto',
-            padding: '32px 24px',
-            display: 'flex',
-            flexWrap: 'wrap',
-            gap: '20px',
-            alignItems: 'center',
-            justifyContent: 'space-between'
-          }}
-        >
-          <div style={{ display: 'flex', alignItems: 'center', gap: '12px', flexWrap: 'wrap' }}>
-            <span className="brand-mark">
-              <BrandMark size={16} />
-            </span>
-            <span style={{ fontWeight: 700, fontSize: '15px' }}>OrgScreen</span>
-            <span className="pill pill-brand" style={{ background: 'var(--primary-soft)', color: 'var(--primary)', borderColor: 'rgba(224,83,27,0.25)' }}>
-              <Sparkles size={12} /> Powered by Gemini 2.5 Flash
-            </span>
-          </div>
-
-          <div style={{ display: 'flex', alignItems: 'center', gap: '20px', flexWrap: 'wrap' }}>
-            <a
-              href="mailto:silogrp1@gmail.com"
-              style={{
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: '6px',
-                color: 'var(--ink)',
-                textDecoration: 'none',
-                fontSize: '14px',
-                fontWeight: 500
-              }}
-            >
-              <Mail size={14} color="var(--primary)" /> silogrp1@gmail.com
-            </a>
-            <Link
-              href="/team"
-              style={{ color: 'var(--muted)', textDecoration: 'none', fontSize: '14px' }}
-            >
-              Team
-            </Link>
-          </div>
-        </div>
-
-        <div
-          style={{
-            borderTop: '1px solid var(--border)',
-            padding: '14px 24px',
-            textAlign: 'center',
-            color: 'var(--muted-2)',
-            fontSize: '12.5px',
-            letterSpacing: '0.04em'
-          }}
-        >
+        <p style={{ textAlign: 'center', color: 'var(--muted-2)', fontSize: '12.5px', marginTop: '64px', letterSpacing: '0.04em' }}>
           OrgScreen · Umurava AI Hackathon · Built with Gemini, Next.js, and a lot of Kinyarwanda coffee.
-        </div>
-      </footer>
+        </p>
+      </main>
     </>
   );
 }
